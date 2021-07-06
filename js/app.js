@@ -178,7 +178,11 @@ const app = new Vue({
              */
             hAngle()
             {
-                return this.calcAngle(this.fovWidth);
+                let rad = this.calcAngle(this.fovWidth);
+
+                return rad < 2
+                    ? rad
+                    : 2;
             },
             /**
              * @returns {number}
@@ -243,6 +247,7 @@ const app = new Vue({
         return {
             c: null,
             ctx: null,
+            errors: [],
             canvas: {
                 height: 600,
                 width: 1000,
@@ -285,7 +290,6 @@ const app = new Vue({
                         unit: "°"
                     }
                 ],
-
             },
         }
     }
