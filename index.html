@@ -57,6 +57,7 @@
                                    id="screenSize"
                                    min="20"
                                    max="100"
+                                   step=".5"
                                    v-on:change="drawRig"
                                    v-model="settings.screenSize">
                     </div>
@@ -96,8 +97,9 @@
                 </div>
             </div>
         </div>
-        <div class="border rounded p-2 mb-2 text-center">
+        <div id="canvasContainer" class="border rounded p-2 mb-2 text-center">
             <canvas id="fovCanvas"
+                    class="border"
                     v-bind:width="canvas.width"
                     v-bind:height="canvas.height">
             </canvas>

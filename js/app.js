@@ -8,6 +8,28 @@ const app = new Vue({
             init()
             {
                 this.c = document.getElementById("fovCanvas");
+                this.resizeCanvas();
+            },
+            resizeCanvas()
+            {
+                let containerWidth = document.getElementById("canvasContainer").offsetWidth;
+
+                this.canvas = {
+                    width: containerWidth * 0.95,
+                    height: (containerWidth / 2) * 0.95,
+                    center: {
+                        x: ((containerWidth / 2)) * 0.95,
+                        y: (containerWidth / 4) * 0.95,
+                    }
+                }
+
+                // adjust globalScale
+                this.globalScaleFactor = this.canvas.width < 400
+                    ? 1
+                    : this.canvas.width < 850
+                        ? 3
+                        : 4;
+
                 this.drawRig();
             },
             /**
@@ -120,11 +142,7 @@ const app = new Vue({
                     this.drawLine(leftScreenOuterX - 30, 10, leftScreenOuterX - 30, screenOuterY);
                     this.drawLine(leftScreenOuterX - 40, 10, leftScreenOuterX - 20, 10);
                     this.drawLine(leftScreenOuterX - 40, screenOuterY, leftScreenOuterX - 20, screenOuterY);
-                    this.ctx.save();
-                    this.ctx.translate(5, 300);
-                    this.ctx.rotate(-0.5*Math.PI);
-                    this.drawText(((screenOuterY - 10) / this.globalScaleFactor).toFixed(2) + "cm", leftScreenOuterX - 50, ((screenOuterY - 10) / 2));
-                    this.ctx.restore();
+                    this.drawText(((screenOuterY - 10) / this.globalScaleFactor).toFixed(2) + "cm", leftScreenOuterX - 60, ((screenOuterY - 10) / 2));
 
                     // measures: screen angles
                     this.drawCircle(leftPivot, 10, 40, 0, ((180 - this.tripleAngle) * Math.PI / 180));
@@ -139,121 +157,132 @@ const app = new Vue({
                 return Math.atan(baseInCm / 2 / this.settings.screenDistance) * 2;
             },
         },
+    created()
+    {
+        this.init();
+        window.addEventListener("resize", this.resizeCanvas);
+    },
     mounted()
     {
         this.init();
     },
+    destroyed()
+    {
+        window.removeEventListener("resize", this.resizeCanvas);
+    },
     computed:
+    {
+        /**
+         * @returns {number}
+         */
+        headPivot()
         {
-            /**
-             * @returns {number}
-             */
-            headPivot()
-            {
-                return 10 + this.headRadius + (this.settings.screenDistance * this.globalScaleFactor);
-            },
-            /**
-             * @returns {number}
-             */
-            headRadius()
-            {
-                return 10 * this.globalScaleFactor;
-            },
-            /**
-             * @returns {number}
-             */
-            fovHeight()
-            {
-                return Math.sin(Math.atan(this.screenRatio.y / this.screenRatio.x )) * (this.settings.screenSize * 2.54);
-            },
-            /**
-             * @returns {number}
-             */
-            fovWidth()
-            {
-                return Math.cos(Math.atan(this.screenRatio.y / this.screenRatio.x )) * (this.settings.screenSize * 2.54);
-            },
-            /**
-             * @returns {number}
-             */
-            hAngle()
-            {
-                let rad = this.calcAngle(this.fovWidth);
-
-                return rad < 2
-                    ? rad
-                    : 2;
-            },
-            /**
-             * @returns {number}
-             */
-            vAngle()
-            {
-                return this.calcAngle(this.fovHeight);
-            },
-            /**
-             * @returns {{x: number, y: number}}
-             */
-            screenRatio()
-            {
-                let ratio = this.settings.screenRatio.split(':');
-                return {
-                    x: parseFloat(ratio[0]),
-                    y: parseFloat(ratio[1]),
-                };
-            },
-            /**
-             * @returns {number}
-             */
-            screenCount()
-            {
-                return this.settings.multipleScreens
-                    ? 3
-                    : 1;
-            },
-            /**
-             * @returns {number}
-             */
-            tripleAngle()
-            {
-                return this.hAngle * (180 / Math.PI);
-            },
-            results()
-            {
-                let results = [];
-
-                this.games.hFov.forEach(game => {
-                    let value = ((180 / Math.PI) * (this.hAngle * this.screenCount) * game.factor);
-
-                    results.push({
-                        game: game.name,
-                        text: value.toFixed(game.decimals) + game.unit
-                    });
-                });
-
-                this.games.vFov.forEach(game => {
-                    let value = ((180 / Math.PI) * (this.vAngle) * game.factor);
-
-                    results.push({
-                        game: game.name,
-                        text: value.toFixed(game.decimals) + game.unit
-                    });
-                });
-
-                return results;
-            }
+            return 10 + this.headRadius + (this.settings.screenDistance * this.globalScaleFactor);
         },
+        /**
+         * @returns {number}
+         */
+        headRadius()
+        {
+            return 10 * this.globalScaleFactor;
+        },
+        /**
+         * @returns {number}
+         */
+        fovHeight()
+        {
+            return Math.sin(Math.atan(this.screenRatio.y / this.screenRatio.x )) * (this.settings.screenSize * 2.54);
+        },
+        /**
+         * @returns {number}
+         */
+        fovWidth()
+        {
+            return Math.cos(Math.atan(this.screenRatio.y / this.screenRatio.x )) * (this.settings.screenSize * 2.54);
+        },
+        /**
+         * @returns {number}
+         */
+        hAngle()
+        {
+            let rad = this.calcAngle(this.fovWidth);
+
+            return rad < 2
+                ? rad
+                : 2;
+        },
+        /**
+         * @returns {number}
+         */
+        vAngle()
+        {
+            return this.calcAngle(this.fovHeight);
+        },
+        /**
+         * @returns {{x: number, y: number}}
+         */
+        screenRatio()
+        {
+            let ratio = this.settings.screenRatio.split(':');
+            return {
+                x: parseFloat(ratio[0]),
+                y: parseFloat(ratio[1]),
+            };
+        },
+        /**
+         * @returns {number}
+         */
+        screenCount()
+        {
+            return this.settings.multipleScreens
+                ? 3
+                : 1;
+        },
+        /**
+         * @returns {number}
+         */
+        tripleAngle()
+        {
+            let angle = this.hAngle * (180 / Math.PI);
+
+            return angle < 90 ? angle : 90;
+        },
+        results()
+        {
+            let results = [];
+
+            this.games.hFov.forEach(game => {
+                let value = ((180 / Math.PI) * (this.hAngle * this.screenCount) * game.factor);
+
+                results.push({
+                    game: game.name,
+                    text: value.toFixed(game.decimals) + game.unit
+                });
+            });
+
+            this.games.vFov.forEach(game => {
+                let value = ((180 / Math.PI) * (this.vAngle) * game.factor);
+
+                results.push({
+                    game: game.name,
+                    text: value.toFixed(game.decimals) + game.unit
+                });
+            });
+
+            return results;
+        }
+    },
     data() {
         return {
             c: null,
             ctx: null,
             errors: [],
             canvas: {
-                height: 600,
-                width: 1000,
+                x: 0,
+                y: 0,
                 center: {
-                    x: 500,
-                    y: 300
+                    x: 0,
+                    y: 0,
                 }
             },
             globalScaleFactor: 4,
