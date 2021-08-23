@@ -61,6 +61,21 @@
                                    v-on:change="drawRig"
                                    v-model="settings.screenSize">
                     </div>
+                    <div class="mb-2">
+                        <label for="bezelWidth">Bezel Width
+                            <span class="ml-5 text-muted">{{ settings.bezelWidth }} mm</span>
+                            <span class="small text-muted">*one side</span>
+                        </label>
+
+                        <input type="range"
+                               class="form-range"
+                               id="bezelWidth"
+                               min="0"
+                               max="20"
+                               step=".5"
+                               v-on:change="drawRig"
+                               v-model="settings.bezelWidth">
+                    </div>
                     <div class="">
                         <label for="screenDistance">Distance to Screen: </label>
                         <span class="ml-5 text-muted">{{ settings.screenDistance }} cm</span>

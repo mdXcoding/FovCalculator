@@ -198,7 +198,11 @@ const app = new Vue({
          */
         fovWidth()
         {
-            return Math.cos(Math.atan(this.screenRatio.y / this.screenRatio.x )) * (this.settings.screenSize * 2.54);
+            let bezel = this.settings.multipleScreens
+                ? (this.settings.bezelWidth / 10) * 2
+                : 0;
+
+            return Math.cos(Math.atan(this.screenRatio.y / this.screenRatio.x )) * ((this.settings.screenSize * 2.54) + bezel);
         },
         /**
          * @returns {number}
@@ -296,11 +300,12 @@ const app = new Vue({
                 { name: "4:3" },
             ],
             settings: {
-                screenDistance: 58,
+                screenDistance: 60,
                 screenSize: 32,
                 screenRatio: "16:9",
                 multipleScreens: true,
                 eyeFov: 200,
+                bezelWidth: 10,
             },
             games: {
                 hFov: [
