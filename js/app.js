@@ -93,9 +93,9 @@ const app = new Vue({
 
                 // main screen
                 this.drawLine(
-                    this.canvas.center.x - (this.globalScaleFactor *(this.settings.screenSize * 2.54) / 2),
+                    this.canvas.center.x - (this.globalScaleFactor *(this.displayInfo.width * 2.54) / 2),
                     10,
-                    this.canvas.center.x + (this.globalScaleFactor * (this.settings.screenSize * 2.54) / 2),
+                    this.canvas.center.x + (this.globalScaleFactor * (this.displayInfo.width * 2.54) / 2),
                     10, 'green', 5);
 
                 // head
@@ -117,17 +117,19 @@ const app = new Vue({
                     'red'
                 );
 
+                this.drawText("Please note that these are just an estimate, real world could be different :)", this.canvas.center.x, this.canvas.height - 20);
+
                 // side monitors
                 if (this.settings.multipleScreens)
                 {
                     // declare pivots for main screen
-                    let leftPivot = (this.canvas.width / 2) - (this.globalScaleFactor * (this.settings.screenSize * 2.54) / 2);
-                    let rightPivot = (this.canvas.width / 2) + (this.globalScaleFactor * (this.settings.screenSize * 2.54) / 2);
+                    let leftPivot = (this.canvas.width / 2) - (this.globalScaleFactor * (this.displayInfo.width * 2.54) / 2);
+                    let rightPivot = (this.canvas.width / 2) + (this.globalScaleFactor * (this.displayInfo.width * 2.54) / 2);
 
                     // calculate outer points of screens
-                    let leftScreenOuterX = (this.settings.screenSize * 2.54 * this.globalScaleFactor) * Math.cos((180 - this.tripleAngle) * Math.PI / 180) + leftPivot;
-                    let screenOuterY = (this.settings.screenSize * 2.54 * this.globalScaleFactor) * Math.sin(this.hAngle) + 10;
-                    let rightScreenOuterX = (this.settings.screenSize * 2.54 * this.globalScaleFactor) * Math.cos(this.hAngle) + rightPivot;
+                    let leftScreenOuterX = (this.displayInfo.width * 2.54 * this.globalScaleFactor) * Math.cos((180 - this.tripleAngle) * Math.PI / 180) + leftPivot;
+                    let screenOuterY = (this.displayInfo.width * 2.54 * this.globalScaleFactor) * Math.sin(this.hAngle) + 10;
+                    let rightScreenOuterX = (this.displayInfo.width * 2.54 * this.globalScaleFactor) * Math.cos(this.hAngle) + rightPivot;
 
                     this.drawLine(leftPivot, 10, leftScreenOuterX, screenOuterY, 'green', 5);
                     this.drawLine(rightPivot, 10, rightScreenOuterX, screenOuterY, 'green', 5);
@@ -136,13 +138,13 @@ const app = new Vue({
                     this.drawLine(leftScreenOuterX,(this.headPivot + this.headRadius) * 1.15, leftScreenOuterX, (this.headPivot + this.headRadius) * 1.25);
                     this.drawLine(rightScreenOuterX,(this.headPivot + this.headRadius) * 1.15, rightScreenOuterX, (this.headPivot + this.headRadius) * 1.25);
                     this.drawLine(leftScreenOuterX,(this.headPivot + this.headRadius) * 1.2, rightScreenOuterX, (this.headPivot + this.headRadius) * 1.2);
-                    this.drawText(((rightScreenOuterX - leftScreenOuterX) / this.globalScaleFactor).toFixed() + "cm", this.canvas.center.x, (this.headPivot + this.headRadius) * 1.25);
+                    this.drawText("~" + ((rightScreenOuterX - leftScreenOuterX) / this.globalScaleFactor).toFixed() + "cm", this.canvas.center.x, (this.headPivot + this.headRadius) * 1.25);
 
                     // measures: screen to screen height
                     this.drawLine(leftScreenOuterX - 30, 10, leftScreenOuterX - 30, screenOuterY);
                     this.drawLine(leftScreenOuterX - 40, 10, leftScreenOuterX - 20, 10);
                     this.drawLine(leftScreenOuterX - 40, screenOuterY, leftScreenOuterX - 20, screenOuterY);
-                    this.drawText(((screenOuterY - 10) / this.globalScaleFactor).toFixed(2) + "cm", leftScreenOuterX - 60, ((screenOuterY - 10) / 2));
+                    this.drawText("~" + ((screenOuterY - 10) / this.globalScaleFactor).toFixed(2) + "cm", leftScreenOuterX - 60, ((screenOuterY - 10) / 2));
 
                     // measures: screen angles
                     this.drawCircle(leftPivot, 10, 40, 0, ((180 - this.tripleAngle) * Math.PI / 180));
@@ -273,8 +275,28 @@ const app = new Vue({
                 });
             });
 
+            results.push({
+                game: "screen width",
+                text: "~" + (this.displayInfo.width * 2.54).toFixed(1) + "cm",
+            });
+
+            results.push({
+                game: "screen height",
+                text: "~" + (this.displayInfo.height * 2.54).toFixed(1) + "cm",
+            });
+
             return results;
-        }
+        },
+        displayInfo()
+        {
+            let calculatedDiagonal = Math.sqrt(Math.pow(this.screenRatio.x, 2) + Math.pow(this.screenRatio.y, 2));
+            let factor = this.settings.screenSize / calculatedDiagonal;
+
+            return {
+                width: this.screenRatio.x * factor,
+                height: this.screenRatio.y * factor,
+            }
+        },
     },
     data() {
         return {
