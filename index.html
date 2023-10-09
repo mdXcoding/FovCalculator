@@ -19,29 +19,26 @@
     <div id="app" class="container mt-5 ">
         <h3>FOV Calculator</h3>
 
-        <div class="row mb-3">
-            <div class="col-12 col-md-6">
+        <div class="row">
+            <div class="col-12 col-md-6 mb-3">
                 <div class="border rounded p-4 mb-2 h-100">
                     <div class="row">
-                        <div class="col">
+                        <div class="col-12 col-lg-6 mb-2">
                             <h5>Settings</h5>
                         </div>
-                        <div class="col">
+                        <div class="col-12 col-lg-6 mb-2">
                             <div class="d-flex justify-content-center align-items-center">
-
                                 <span class="me-2">Imperial</span>
                                 <label class="switch">
                                     <input type="checkbox" v-model="settings.useMetric" @change="drawRig">
                                     <span class="slider round"></span>
                                 </label>
                                 <span class="ms-2">Metric</span>
-
                             </div>
-
                         </div>
                     </div>
-                    <div class="row mb-2">
-                        <div class="col">
+                    <div class="row">
+                        <div class="col-12 col-lg-6 mb-2">
                             <label for="screenRatio">Screen Ratio</label>
                             <select id="screenRatio"
                                     class="form-select"
@@ -54,7 +51,7 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="col">
+                        <div class="col-12 col-lg-6 mb-2">
                             <label for="multipleScreens">Screens</label>
                             <select id="multipleScreens"
                                     class="form-select"
@@ -108,7 +105,7 @@
                     </div>
                 </div>
             </div><!-- /settings -->
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-6 mb-3">
                 <div class="border rounded p-4 mb-2 h-100">
                     <h5>Results</h5>
 
